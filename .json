@@ -1,0 +1,98 @@
+{
+  "forbidden_terms": {
+    "rule_id": "FORBIDDEN_001",
+    "description": "Prohibited language and sensitive terms detection",
+    "severity": "high",
+    "patterns": [
+      "\\b(?:confidential|classified|secret|proprietary)\\b",
+      "\\b(?:insider|leak|breach|violation)\\b",
+      "\\b(?:hack|exploit|vulnerability)\\b",
+      "\\b(?:backdoor|malware|trojan)\\b",
+      "\\b(?:bribe|kickback|payoff)\\b"
+    ]
+  },
+  "pii_detection": {
+    "rule_id": "PII_001",
+    "description": "Personal Identifiable Information detection",
+    "severity": "critical",
+    "patterns": [
+      "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+      "\\b\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}\\b",
+      "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b",
+      "\\b\\d{3}[\\s.-]?\\d{3}[\\s.-]?\\d{4}\\b",
+      "\\b(?:passport|driver.?license|tax.?id)\\s*:?\\s*[A-Z0-9]{6,}\\b"
+    ]
+  },
+  "financial_terms": {
+    "rule_id": "FIN_001", 
+    "description": "Financial compliance and fraud detection",
+    "severity": "medium",
+    "patterns": [
+      "\\b(?:insider trading|market manipulation|fraud)\\b",
+      "\\b(?:money laundering|tax evasion|embezzlement)\\b",
+      "\\$\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?\\s*(?:million|billion)",
+      "\\b(?:offshore|swiss|cayman)\\s+(?:account|bank)\\b",
+      "\\b(?:shell company|dummy corporation)\\b"
+    ]
+  },
+  "data_privacy": {
+    "rule_id": "PRIV_001",
+    "description": "Data privacy and GDPR compliance violations",
+    "severity": "high", 
+    "patterns": [
+      "\\b(?:gdpr|hipaa|pci|compliance)\\s+(?:violation|breach)\\b",
+      "\\b(?:personal data|sensitive information)\\s+(?:exposed|leaked)\\b",
+      "\\b(?:unauthorized access|data breach|privacy violation)\\b",
+      "\\b(?:right to be forgotten|data portability)\\s+(?:denied|ignored)\\b",
+      "\\bconsent\\s+(?:not obtained|bypassed|ignored)\\b"
+    ]
+  },
+  "hr_violations": {
+    "rule_id": "HR_001",
+    "description": "Human resources and workplace policy violations",
+    "severity": "high",
+    "patterns": [
+      "\\b(?:harassment|discrimination|bullying)\\b",
+      "\\b(?:hostile work environment|inappropriate conduct)\\b",
+      "\\b(?:retaliation|wrongful termination)\\b",
+      "\\b(?:sexual harassment|workplace violence)\\b",
+      "\\b(?:wage theft|overtime violation)\\b"
+    ]
+  },
+  "intellectual_property": {
+    "rule_id": "IP_001",
+    "description": "Intellectual property and trade secret violations",
+    "severity": "high",
+    "patterns": [
+      "\\b(?:trade secret|proprietary information)\\s+(?:shared|leaked)\\b",
+      "\\b(?:copyright infringement|patent violation)\\b",
+      "\\b(?:reverse engineer|steal|copy)\\s+(?:code|design|formula)\\b",
+      "\\b(?:compete|competitor)\\s+(?:information|data)\\b",
+      "\\bnda\\s+(?:violation|breach)\\b"
+    ]
+  },
+  "security_violations": {
+    "rule_id": "SEC_001",
+    "description": "Information security policy violations", 
+    "severity": "critical",
+    "patterns": [
+      "\\b(?:password|credentials)\\s+(?:shared|exposed)\\b",
+      "\\b(?:unauthorized|unapproved)\\s+(?:software|access|login)\\b",
+      "\\b(?:phishing|malware|virus)\\s+(?:attack|infection)\\b",
+      "\\b(?:security breach|data leak|system compromise)\\b",
+      "\\b(?:vpn|firewall|encryption)\\s+(?:disabled|bypassed)\\b"
+    ]
+  },
+  "regulatory_compliance": {
+    "rule_id": "REG_001",
+    "description": "Regulatory and legal compliance violations",
+    "severity": "critical",
+    "patterns": [
+      "\\b(?:sox|sarbanes.oxley)\\s+(?:violation|non.compliance)\\b",
+      "\\b(?:sec|fcc|fda)\\s+(?:violation|penalty|fine)\\b",
+      "\\b(?:audit|investigation)\\s+(?:failed|hidden|covered.up)\\b",
+      "\\b(?:regulatory|compliance)\\s+(?:failure|breach|violation)\\b",
+      "\\b(?:whistleblower|report|disclose)\\s+(?:suppressed|ignored)\\b"
+    ]
+  }
+}

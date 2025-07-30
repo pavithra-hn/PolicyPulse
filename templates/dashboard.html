@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolicyPulse - Internal Policy Compliance Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        textarea, input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .scan-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .scan-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scan-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .scan-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-score {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+
+        .violation-detail {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .violation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .severity-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .severity-critical { background: #dc3545; color: white; }
+        .severity-high { background: #fd7e14; color: white; }
+        .severity-medium { background: #ffc107; color: #000; }
+        .severity-low { background: #28a745; color: white; }
+
+        .highlighted-text {
+            background: #fff3cd;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border-left: 3px solid #ffc107;
+            margin: 0.5rem 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PolicyPulse</h1>
+            <p>Internal Policy Compliance Checker - Real-time document scanning and violation detection</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalScans">0</div>
+                <div class="stat-label">Total Scans</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalViolations">0</div>
+                <div class="stat-label">Violations Found</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="averageRisk">0%</div>
+                <div class="stat-label">Average Risk Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeRules">0</div>
+                <div class="stat-label">Active Rules</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>📄 Document Scanner</h2>
+                <form id="scanForm">
+                    <div class="form-group">
+                        <label for="documentText">Paste document text or email content:</label>
+                        <textarea id="documentText" placeholder="Enter text to scan for policy violations..."></textarea>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeEmails">
+                        <label for="includeEmails">Include email analysis</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inboxSelect">Select inbox:</label>
+                        <select id="inboxSelect">
+                            <option value="inbox_1">Executive Inbox</option>
+                            <option value="inbox_2">HR Inbox</option>
+                            <option value="inbox_3">Finance Inbox</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="scanBtn">🔍 Scan Document</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📧 Email Monitor</h2>
+                <div class="form-group">
+                    <label for="emailInbox">Select inbox to view:</label>
+                    <select id="emailInbox">
+                        <option value="inbox_1">Executive Inbox</option>
+                        <option value="inbox_2">HR Inbox</option>  
+                        <option value="inbox_3">Finance Inbox</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="loadEmailsBtn">📥 Load Emails</button>
+                
+                <div id="emailList" style="margin-top: 1rem; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>📊 Scan Results</h2>
+            <div id="scanResults">
+                <p style="text-align: center; color: #666; padding: 2rem;">
+                    No scans performed yet. Use the scanner above to check documents for policy violations.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PolicyPulse {
+            constructor() {
+                this.scans = [];
+                this.activeRules = 0;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadScans();
+                this.loadRules();
+            }
+
+            setupEventListeners() {
+                document.getElementById('scanForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.performScan();
+                });
+
+                document.getElementById('loadEmailsBtn').addEventListener('click', () => {
+                    this.loadEmails();
+                });
+            }
+
+            async performScan() {
+                const text = document.getElementById('documentText').value.trim();
+                if (!text) {
+                    alert('Please enter text to scan');
+                    return;
+                }
+
+                const scanBtn = document.getElementById('scanBtn');
+                const originalText = scanBtn.textContent;
+                
+                scanBtn.disabled = true;
+                scanBtn.innerHTML = '<div class="spinner"></div> Scanning...';
+
+                try {
+                    const response = await fetch('/api/scan', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            include_emails: document.getElementById('includeEmails').checked,
+                            inbox_id: document.getElementById('inboxSelect').value
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        this.displayScanResult(result);
+                        this.loadScans();
+                        document.getElementById('documentText').value = '';
+                    } else {
+                        alert('Error: ' + result.error);
+                    }
+                } catch (error) {
+                    alert('Network error: ' + error.message);
+                } finally {
+                    scanBtn.disabled = false;
+                    scanBtn.textContent = originalText;
+                }
+            }
+
+            async loadScans() {
+                try {
+                    const response = await fetch('/api/scans');
+                    const data = await response.json();
+                    this.scans = data.scans || [];
+                    this.displayScansList();
+                    this.updateStats();
+                } catch (error) {
+                    console.error('Error loading scans:', error);
+                }
+            }
+
+            async loadRules() {
+                try {
+                    const response = await fetch('/api/rules');
+                    const rules = await response.json();
+                    this.activeRules = Object.keys(rules).length;
+                    this.updateStats();
+                } catch (error) {
+                    console.error('Error loading rules:', error);
+                }
+            }
+
+            async loadEmails() {
+                const inboxId = document.getElementById('emailInbox').value;
+                const emailList = document.getElementById('emailList');
+                
+                emailList.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                try {
+                    const response = await fetch(`/api/emails/${inboxId}`);
+                    const data = await response.json();
+                    
+                    if (response.ok && data.emails) {
+                        this.displayEmails(data.emails);
+                    } else {
+                        emailList.innerHTML = '<p>Error loading emails</p>';
+                    }
+                } catch (error) {
+                    emailList.innerHTML = '<p>Network error loading emails</p>';
+                }
+            }
+
+            displayEmails(emails) {
+                const emailList = document.getElementById('emailList');
+                
+                if (!emails.length) {
+                    emailList.innerHTML = '<p>No emails found</p>';
+                    return;
+                }
+
+                const emailsHtml = emails.map(email => `
+                    <div class="scan-item" onclick="policyPulse.scanEmailContent('${email.id}', \`${email.body.replace(/`/g, '\\`')}\`)">
+                        <div class="scan-meta">
+                            <strong>${email.subject}</strong>
+                            <small>${new Date(email.timestamp).toLocaleString()}</small>
+                        </div>
+                        <div>From: ${email.sender}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                            ${email.body.substring(0, 100)}...
+                        </div>
+                    </div>
+                `).join('');
+
+                emailList.innerHTML = emailsHtml;
+            }
+
+            async scanEmailContent(emailId, content) {
+                try {
+                    const response = await fetch('/api/scan', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: content
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        this.displayScanResult(result);
+                        this.loadScans();
+                    }
+                } catch (error) {
+                    alert('Error scanning email: ' + error.message);
+                }
+            }
+
+            displayScansList() {
+                const resultsDiv = document.getElementById('scanResults');
+                
+                if (!this.scans.length) {
+                    resultsDiv.innerHTML = `
+                        <p style="text-align: center; color: #666; padding: 2rem;">
+                            No scans performed yet. Use the scanner above to check documents for policy violations.
+                        </p>
+                    `;
+                    return;
+                }
+
+                const scansHtml = this.scans.map(scan => `
+                    <div class="scan-item" onclick="policyPulse.viewScanDetails('${scan.scan_id}')">
+                        <div class="scan-meta">
+                            <span>Scan ID: ${scan.scan_id.substring(0, 8)}...</span>
+                            <span class="risk-score ${this.getRiskClass(scan.risk_score)}">
+                                Risk: ${Math.round(scan.risk_score * 100)}%
+                            </span>
+                        </div>
+                        <div>
+                            <strong>${scan.violations} violations found</strong> • 
+                            ${new Date(scan.timestamp).toLocaleString()}
+                        </div>
+                    </div>
+                `).join('');
+
+                resultsDiv.innerHTML = scansHtml;
+            }
+
+            async viewScanDetails(scanId) {
+                try {
+                    const response = await fetch(`/api/reports/${scanId}`);
+                    const report = await response.json();
+                    
+                    if (response.ok) {
+                        this.displayDetailedReport(report);
+                    }
+                } catch (error) {
+                    alert('Error loading scan details: ' + error.message);
+                }
+            }
+
+            displayDetailedReport(report) {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.8); z-index: 1000; display: flex;
+                    align-items: center; justify-content: center; padding: 20px;
+                `;
+
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white; border-radius: 15px; max-width: 800px;
+                    max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative;
+                `;
+
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '✕';
+                closeBtn.style.cssText = `
+                    position: absolute; top: 1rem; right: 1rem; background: none;
+                    border: none; font-size: 1.5rem; cursor: pointer; color: #666;
+                `;
+                closeBtn.onclick = () => modal.remove();
+
+                let violationsHtml = '';
+                if (report.violations && report.violations.length > 0) {
+                    violationsHtml = report.violations.map(violation => `
+                        <div class="violation-detail">
+                            <div class="violation-header">
+                                <strong>${violation.rule_name}</strong>
+                                <span class="severity-badge severity-${violation.severity}">
+                                    ${violation.severity}
+                                </span>
+                            </div>
+                            <p style="color: #666; margin-bottom: 0.5rem;">${violation.description}</p>
+                            <div class="highlighted-text">
+                                <strong>Matched Text:</strong> "${violation.matched_text}"
+                            </div>
+                            <div style="margin-top: 0.5rem;">
+                                <strong>Context:</strong> ${violation.sentence}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                                Confidence: ${Math.round(violation.confidence * 100)}% • 
+                                Rule ID: ${violation.rule_id}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    violationsHtml = '<p style="color: #28a745; text-align: center; padding: 2rem;">✅ No policy violations detected!</p>';
+                }
+
+                modalContent.innerHTML = `
+                    <h2 style="margin-bottom: 1rem; color: #2c3e50;">📄 Detailed Scan Report</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${report.total_violations}</div>
+                            <div style="color: #666;">Violations</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${Math.round(report.risk_score * 100)}%</div>
+                            <div style="color: #666;">Risk Score</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${report.sentences ? report.sentences.length : 0}</div>
+                            <div style="color: #666;">Sentences</div>
+                        </div>
+                    </div>
+                    <h3 style="margin-bottom: 1rem;">🚨 Policy Violations</h3>
+                    ${violationsHtml}
+                `;
+
+                modalContent.appendChild(closeBtn);
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+            }
+
+            displayScanResult(result) {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 1001;
+                    background: linear-gradient(45deg, #667eea, #764ba2); color: white;
+                    padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    transform: translateX(100%); transition: transform 0.3s ease;
+                `;
+
+                toast.innerHTML = `
+                    <strong>Scan Complete!</strong><br>
+                    ${result.violations_found} violations found<br>
+                    Risk Score: ${Math.round(result.risk_score * 100)}%
+                `;
+
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(0)';
+                }, 100);
+
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            updateStats() {
+                document.getElementById('statsGrid').style.display = 'grid';
+                document.getElementById('totalScans').textContent = this.scans.length;
+                
+                const totalViolations = this.scans.reduce((sum, scan) => sum + scan.violations, 0);
+                document.getElementById('totalViolations').textContent = totalViolations;
+                
+                const avgRisk = this.scans.length > 0 
+                    ? this.scans.reduce((sum, scan) => sum + scan.risk_score, 0) / this.scans.length
+                    : 0;
+                document.getElementById('averageRisk').textContent = Math.round(avgRisk * 100) + '%';
+                
+                document.getElementById('activeRules').textContent = this.activeRules;
+            }
+
+            getRiskClass(riskScore) {
+                if (riskScore < 0.3) return 'risk-low';
+                if (riskScore < 0.7) return 'risk-medium';
+                return 'risk-high';
+            }
+        }
+
+        // Initialize the application
+        const policyPulse = new PolicyPulse();
+    </script>
+</body>
+</html>
