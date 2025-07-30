@@ -16,7 +16,7 @@
 ---
 
 ## 📁 Project Structure
-
+```bash
 project-root/
 │
 ├── app.py # Main Flask server with endpoints
@@ -25,7 +25,7 @@ project-root/
 │ └── dashboard.html # Web dashboard template
 ├── static/ # Static assets (optional)
 └── README.md # You are here
-
+bash```
 ---
 
 ## 🧠 How It Works
