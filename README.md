@@ -1,3 +1,5 @@
+
+
 # 🛡️ PolicyPulse - Compliance Violation Detection System
 
 **PolicyPulse** is an intelligent text-scanning tool designed to detect policy violations, suspicious patterns, and sensitive data disclosures in unstructured text or email content. It leverages a hybrid approach of **rule-based regex patterns** and **machine learning (TF-IDF + cosine similarity)** for robust policy compliance checks.
@@ -6,26 +8,28 @@
 
 ## 🚀 Features
 
-- 🔍 Rule-based scanning using customizable regex patterns
-- 🤖 Semantic analysis using TF-IDF + Cosine Similarity
-- 🧠 NLP-powered sentence segmentation via spaCy
-- 📩 Simulated email inbox with mock data scanning
-- 🧾 API endpoints for scanning, reporting, and rule management
-- 🌐 Web dashboard frontend (`dashboard.html`)
+* 🔍 Rule-based scanning using customizable regex patterns
+* 🤖 Semantic analysis using TF-IDF + Cosine Similarity
+* 🧠 NLP-powered sentence segmentation via spaCy
+* 📩 Simulated email inbox with mock data scanning
+* 🧾 API endpoints for scanning, reporting, and rule management
+* 🌐 Web dashboard frontend (`dashboard.html`)
 
 ---
 
 ## 📁 Project Structure
-```bash
-project-root/
+
+```
+policypulse/
 │
-├── app.py # Main Flask server with endpoints
-├── policy_rules.json # JSON-based rule definitions
+├── app.py                 # Main Flask server with endpoints
+├── policy_rules.json      # JSON-based rule definitions
 ├── templates/
-│ └── dashboard.html # Web dashboard template
-├── static/ # Static assets (optional)
-└── README.md # You are here
-bash```
+│   └── dashboard.html     # Web dashboard template
+├── static/                # Static assets (optional)
+└── README.md              # You're here
+```
+
 ---
 
 ## 🧠 How It Works
@@ -39,84 +43,110 @@ bash```
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com//pavithra-hn/policypulse.git
+git clone https://github.com/pavithra-hn/policypulse.git
 cd policypulse
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 python app.py
-Server starts at http://localhost:5000
-🧪 API Endpoints
-🔹 Scan Text
+```
 
-POST /api/scan
+Server starts at: [http://localhost:5000](http://localhost:5000)
 
-Request JSON:
+---
 
+## 🧪 API Endpoints
+
+### 🔹 Scan Text
+
+**POST** `/api/scan`
+
+**Request JSON:**
+
+```json
 {
   "text": "Your text here...",
   "include_emails": true,
   "inbox_id": "inbox_1"
 }
+```
 
-Response:
+**Response:**
 
-    scan_id, risk_score, violations_found
+```json
+{
+  "scan_id": "...",
+  "risk_score": 0.85,
+  "violations_found": ["SSN detected", "Confidential phrase found"]
+}
+```
 
-🔹 Get Scan Report
+---
 
-GET /api/reports/<scan_id>
+### 🔹 Get Scan Report
 
-🔹 Get Mock Emails
+**GET** `/api/reports/<scan_id>`
 
-GET /api/emails/<inbox_id>
+---
 
-🔹 View or Update Policy Rules
+### 🔹 Get Mock Emails
 
-GET /api/rules
-POST /api/rules
+**GET** `/api/emails/<inbox_id>`
 
-🔹 List All Scans
+---
 
-GET /api/scans
+### 🔹 View or Update Policy Rules
 
-📧 Example Emails Scanned
+**GET** `/api/rules`
+**POST** `/api/rules`
 
-    Financial leaks
+---
 
-    SSN and Credit Card exposure
+### 🔹 List All Scans
 
-    Compliance avoidance statements
+**GET** `/api/scans`
 
-    Insider trading references
+---
 
-🧩 Technologies Used
+## 📧 Example Email Violations
 
-    Python, Flask
+* Financial leaks
+* SSN and Credit Card exposure
+* Compliance avoidance statements
+* Insider trading references
 
-    spaCy (NLP)
+---
 
-    scikit-learn (TF-IDF, Cosine Similarity)
+## 🧩 Technologies Used
 
-    Regex, JSON
+* Python, Flask
+* spaCy (NLP)
+* scikit-learn (TF-IDF, Cosine Similarity)
+* Regex, JSON
+* SQLite (optional), threading
+* HTML (Jinja2 for dashboard)
 
-    SQLite (optional), threading
+---
 
-    HTML (for dashboard)
+## 🛠 Future Enhancements
 
-🛠 Future Enhancements
+* Persistent database for scan history
+* Frontend UI for managing scans and results
+* Role-based access for compliance teams
+* PDF/Docx document scanning support
 
-    Persistent database for scan history
+---
 
-    Frontend UI for managing scans and results
+## 📝 License
 
-    Role-based access for compliance teams
+MIT License © 2025 \[Pavithra H N]
 
-    PDF/Docx document scanning
+---
 
-📝 License
+## 📬 Contact
 
-MIT License © 2025 [Pavithra H N]
-📬 Contact
+For queries or contributions, feel free to reach out:
+📧 **[pavithrahn56@gmail.com](mailto:pavithrahn56@gmail.com)**
 
-For any queries or contributions, feel free to reach out at [pavithrahn56@gmail.com]
+---
+
 
